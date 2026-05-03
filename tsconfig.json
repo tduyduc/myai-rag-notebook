@@ -1,0 +1,22 @@
+{
+  "extends": ["@tsconfig/node20", "@tsconfig/strictest"],
+  "compilerOptions": {
+    "strict": true,
+    "forceConsistentCasingInFileNames": true,
+    "module": "nodenext",
+    "moduleResolution": "nodenext",
+    "resolveJsonModule": true,
+    "checkJs": true,
+    "declaration": true,
+    "exactOptionalPropertyTypes": false,
+    "emitDecoratorMetadata": true,
+    "experimentalDecorators": true,
+    "allowSyntheticDefaultImports": true,
+    "sourceMap": true,
+    "outDir": "./dist",
+    "incremental": true,
+    "skipLibCheck": true,
+    "esModuleInterop": true
+  },
+  "exclude": ["dist"]
+}
