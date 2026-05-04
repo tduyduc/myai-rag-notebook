@@ -4,6 +4,7 @@ import { MemoResponseDto } from './dto/Memo.response.dto.js';
 import { QueryBodyDto } from './dto/Query.body.dto.js';
 import { QueryResponseDto } from './dto/Query.response.dto.js';
 import { OllamaClient } from './ollama-client/ollama-client.injection-token.js';
+import { isDefined } from './utils/is-defined.js';
 import { VectorDatabase } from './vector-database/vector-database.injection-token.js';
 
 @Injectable()
@@ -20,7 +21,7 @@ export class AppService {
 
     return {
       text: result.text,
-      categories: result.categories,
+      categories: Array.from(result.categories).filter(isDefined),
     };
   }
 
@@ -51,25 +52,61 @@ export class AppService {
       category: body.category ?? '',
     });
 
+    const notes = vectorDbResults
+      .map(({ text, categories }) => {
+        const categoryLabel = categories.length
+          ? ` [categories: ${Array.from(categories).join(', ')}]`
+          : '';
+
+        return `- ${text}${categoryLabel}`;
+      })
+      .join('\n');
+
     return `
-You are an assistant who answers queries based on the memos previously ingested by user.
-Here's the knowledge base:
+Answer the user's question using only the notes below.
+Reply directly to the user's question.
+Do not answer this instruction message.
+Do not explain your reasoning.
+Treat each note as a factual statement, even if the wording is not identical to the user's question.
+If multiple notes are relevant, combine them into one concise answer.
 
-\`\`\`json
-${JSON.stringify(
-  vectorDbResults.map(({ id, text, createdAt, categories }) => ({
-    id,
-    text,
-    createdAt,
-    categories,
-  })),
-)}
-\`\`\`
+---
 
-- Mirror the language of user query.
-- Use EXCLUSIVELY the knowledge base above to answer the user query.
-- Don't give follow-up questions (unless explicitly asked by user).
-- If the knowledge base is empty or no answers can be made based on the knowledge base, answer that you don't know and suggest other queries that might successfully answer (if some clues can be found from the knowledge base).
+Rules:
+- Mirror the language of the user's question.
+- If the notes do not contain the answer, say: "I don't know" (language mirrored).
+- Do not ask follow-up questions unless the user explicitly asks for them.
+- Keep the answer concise and factual.
+
+---
+
+Examples:
+- Question: What is my favorite database?
+  Notes:
+  - My favorite database is LanceDB.
+  Answer: Your favorite database is LanceDB.
+- Question: What backend technologies do I use?
+  Notes:
+  - I build APIs with NestJS and Fastify.
+  - I validate requests with class-validator.
+  Answer: You use NestJS, Fastify, and class-validator.
+- Question: Tôi thích lập trình với ngôn ngữ gì?
+  Notes:
+  - Tôi thích lập trình với TypeScript.
+  Answer: Bạn thích lập trình với TypeScript.
+- Question: 私の好きなフレームワークは何ですか？
+  Notes:
+  - My favorite framework is NestJS.
+  Answer: あなたの好きなフレームワークはNestJSです。
+- Question: What is the meaning of life?
+  Notes:
+  - No relevant notes found.
+  Answer: I don't know.
+
+---
+
+Notes:
+${notes || '- No relevant notes found.'}
 `;
   }
 }
