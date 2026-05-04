@@ -89,7 +89,10 @@ ${commandLine} ${scriptName} query [--category <CATEGORY>] [--[no-]stream] <TEXT
       };
       const response = await ky.post(url, { json: requestBody });
 
-      console.dir(await response.json(), { depth: Infinity });
+      /** @type {import('./src/dto/Memo.response.dto').MemoResponseDto} */
+      const jsonBody = await response.json();
+
+      console.dir(jsonBody, { depth: Infinity });
 
       break;
     }
@@ -192,7 +195,8 @@ ${commandLine} ${scriptName} query [--category <CATEGORY>] [--[no-]stream] <TEXT
         url.pathname = '/api/query';
 
         const response = await ky.post(url, { json: requestBody });
-        /** @type {{ response: string }} */
+
+        /** @type {import('./src/dto/Query.response.dto').QueryResponseDto} */
         const jsonBody = await response.json();
 
         console.log(jsonBody.response);
