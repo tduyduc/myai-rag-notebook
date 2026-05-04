@@ -7,13 +7,19 @@ A demonstration notebook for Retrieval-Augmented Generation (RAG).
 ### What's Included
 
 - MIT-licensed project for learning and reuse in other projects
-- TypeScript 7 Native Preview for faster build and type-check workflows
+- TypeScript 7 Native Preview for faster type checking and builds
+- NestJS back-end powered by Fastify
+- Swagger API docs available at `/api`
+- Global request validation via `class-validator` and NestJS `ValidationPipe`
 - Memo ingestion
-- Memo retrieval and querying (including SSE streaming)
-- Ollama for both chat generation and embeddings
-- LanceDB for persistent vector storage and similarity search
+- Memo retrieval and querying, including SSE streaming
+- CLI commands for memo and query workflows, with streamed and non-streamed modes
+- Category-aware memo filtering during retrieval
+- Ollama-backed response generation and embeddings
+- LanceDB-backed persistent vector storage and similarity search
+- Automatic LanceDB table and schema initialization on startup
 - Abstract class-based dependency injection contracts
-- Optional operation timing/profiling (enabled via environment variable)
+- Optional operation timing and profiling (enabled via environment variable)
 
 ### What's Not Included
 
@@ -21,6 +27,9 @@ A demonstration notebook for Retrieval-Augmented Generation (RAG).
 - Memo deletion (planned)
 - Authentication
 - Rate limiting
+- Unit tests
+- Robust error handling and retry strategies (currently minimal)
+- Text chunking for long-document ingestion
 
 ## Installation
 
@@ -28,18 +37,18 @@ Node.js 20+ is required to run this project. Latest LTS version is recommended.
 
 ```bash
 # Copy environment variable files
-$ cp --update=none .env.example .env
-$ cp --update=none .env.shared.example .env.shared
+cp --update=none .env.example .env
+cp --update=none .env.shared.example .env.shared
 
 # Install packages
-$ npm ci
+npm ci
 ```
 
 ## Getting Started
 
 ```bash
 # Starts Docker for background services
-$ docker-compose up
+docker compose up
 ```
 
 To verify that Ollama is working, assuming that you've pulled the `gemma3:270m` model, run the following command:
